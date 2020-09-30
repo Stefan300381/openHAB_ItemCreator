@@ -58,30 +58,34 @@
 						}
 					});			    
 				}); 
-				$("#btnCreateItems").click(function(){
-					$("#divContent").hide();
-					$("#divContent").html("");
-					$.getJSON($(location).attr("origin") + '/rest/things/' + $("#selThings").val(), function(data) {
-   					 	// JSON result in `data` variable
-						$("#preDebug").html(JSON.stringify(data,null, 4));
-						$.each( data.channels, function( index, value ){
-							//$.getJSON($(location).attr("origin") + '/rest/channel-types/' + jQuery('<div />').text(value.channelTypeUID).html(), function(moredata) {
-							if (value.itemType) {
-								$.getJSON($(location).attr("origin") + '/rest/channel-types/' + value.channelTypeUID, function(moredata) {
-									// JSON result in `data` variable
-									$("#preDebug").append('<br>');
-									$("#preDebug").append(JSON.stringify(moredata,null, 4));
-									if (moredata.stateDescription.pattern) {
-										$("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + ' [' + moredata.stateDescription.pattern + ']" { channel="' + value.uid + '" }' + '</br>')
-									}else{
-										$("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + '" { channel="' + value.uid + '" }' + '</br>')
-									}
-								});
-							}
-						});
-						$("#divContent").show();
-					});			    
-				}); 
+                                $("#btnCreateItems").click(function(){
+                                        $("#divContent").hide();
+                                        $("#divContent").html("");
+                                        $.getJSON($(location).attr("origin") + '/rest/things/' + $("#selThings").val(), function(data) {
+                                                // JSON result in `data` variable
+                                                $("#preDebug").html(JSON.stringify(data,null, 4));
+                                                $.each( data.channels, function( index, value ){
+                                                        //$.getJSON($(location).attr("origin") + '/rest/channel-types/' + jQuery('<div />').text(value.channelTypeUID).html(), function(moredata) {
+                                                        if (value.itemType) {
+                                                                $.getJSON($(location).attr("origin") + '/rest/channel-types/' + value.channelTypeUID, function(moredata) {
+                                                                        // JSON result in `data` variable
+                                                                        $("#preDebug").append('<br>');
+                                                                        $("#preDebug").append(JSON.stringify(moredata,null, 4));
+                                                                        if (moredata.hasOwnProperty('stateDescription')) {
+                                                                                if (moredata.stateDescription.hasOwnProperty('pattern')) {
+                                                                                        $("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + ' [' + moredata.stateDescription.pattern + ']" { channel="' + value.uid + '" }' + '</br>')
+                                                                                }else{
+                                                                                        $("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + '" { channel="' + value.uid + '" }' + '</br>')
+                                                                                }
+                                                                        }else{
+                                                                                $("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + '" { channel="' + value.uid + '" }' + '</br>')
+                                                                        }
+                                                                });
+                                                        }
+                                                });
+                                                $("#divContent").show();
+                                        });
+                                });
 			});
 		</script>
 		<style>
