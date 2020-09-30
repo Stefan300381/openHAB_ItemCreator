@@ -1,0 +1,125 @@
+<html>
+	<head>
+		<title>openHAB Item Creator</title>
+		<script type="text/javascript" src="jquery/jquery-3.5.1.min.js"></script>
+		<link rel="stylesheet" href="jquery-ui/jquery-ui.css">
+		<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#divDebug").resizable();
+				$("#chkDebug").click(function(){
+					if($(this).is(":checked")){
+						$("#divDebug").show();
+					}else{
+						$("#divDebug").hide();
+					}
+				});
+				$("#btnGetBindings").click(function(){
+					$("#divSelBindings").hide();
+                                        $("#divBtnGetThings").hide();
+					$('#selBindings').children().remove().end();
+					$.getJSON($(location).attr("origin") + '/rest/bindings', function(data) {
+   					 	// JSON result in `data` variable
+						$("#preDebug").html(JSON.stringify(data,null, 4));
+						$.each( data, function( index, value ){
+							$('#selBindings').append(
+								$('<option></option>').val(value.id).html(value.name)
+							);
+						});
+						if ($("#selBindings option").length == 0) {
+							alert('Zero Bindings found!');
+						}else{
+							$("#divSelBindings").show();
+							$("#divBtnGetThings").show();
+						}
+					});			    
+				}); 
+				$("#btnGetThings").click(function(){
+					$('#divSelThings').hide();
+					$("#divBtnCreateItems").hide();
+					$('#selThings').children().remove().end();
+					$.getJSON($(location).attr("origin") + '/rest/things', function(data) {
+   					 	// JSON result in `data` variable
+						$("#preDebug").html(JSON.stringify(data,null, 4));
+						$.each( data, function( index, value ){
+							if (value.thingTypeUID.indexOf($("#selBindings").val()) >= 0) {
+								$('#selThings').append(
+									$('<option></option>').val(value.UID).html(value.label)
+								);
+							}
+						});
+						if ($("#selThings option").length == 0) {
+							alert('Zero Things found!');
+						}else{
+							$("#divSelThings").show();
+							$("#divBtnCreateItems").show();
+						}
+					});			    
+				}); 
+				$("#btnCreateItems").click(function(){
+					$("#divContent").hide();
+					$("#divContent").html("");
+					$.getJSON($(location).attr("origin") + '/rest/things/' + $("#selThings").val(), function(data) {
+   					 	// JSON result in `data` variable
+						$("#preDebug").html(JSON.stringify(data,null, 4));
+						$.each( data.channels, function( index, value ){
+							//$.getJSON($(location).attr("origin") + '/rest/channel-types/' + jQuery('<div />').text(value.channelTypeUID).html(), function(moredata) {
+							if (value.itemType) {
+								$.getJSON($(location).attr("origin") + '/rest/channel-types/' + value.channelTypeUID, function(moredata) {
+									// JSON result in `data` variable
+									$("#preDebug").append('<br>');
+									$("#preDebug").append(JSON.stringify(moredata,null, 4));
+									if (moredata.stateDescription.pattern) {
+										$("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + ' [' + moredata.stateDescription.pattern + ']" { channel="' + value.uid + '" }' + '</br>')
+									}else{
+										$("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + '" { channel="' + value.uid + '" }' + '</br>')
+									}
+								});
+							}
+						});
+						$("#divContent").show();
+					});			    
+				}); 
+			});
+		</script>
+		<style>
+			input, select {
+				width: 100%; 
+				height: 2vw;
+			}
+			.hidden {
+				display: none;
+			}
+			.menuitem {
+				float: left; 
+				width: 50%;
+			}
+			.debug {
+				overflow: auto;
+				margin: 0;
+			}
+			.debug:empty {
+				border: none;
+			}
+			.debug:not(:empty) {
+				border: 1px solid grey;
+			}
+		</style>
+		<div style="width: 40%; overflow: hidden;">
+			<div class="menuitem"><input type="button" id="btnGetBindings" value="Get Bindings"></div>
+			<div class="hidden menuitem" id="divSelBindings"><select id="selBindings"></select></div>
+			<div class="hidden menuitem" id="divBtnGetThings"><input type="button" id="btnGetThings" value="Get Things"></div>
+			<div class="hidden menuitem" id="divSelThings"><select id="selThings"></select></div>
+			<div class="hidden menuitem" id="divBtnCreateItems"><input type="button" id="btnCreateItems" value="Create Items"></div>
+		</div>
+		<div>
+			<input type="checkbox" id="chkDebug" name="chkDebug" style="width: auto; height: auto; margin-bottom: 10px; margin-top: 10px;"><label for="chkDebug">Show raw REST response</label>
+		</div>
+		<div style="width: 100%;">
+			<div id="divDebug" style="display: none; margin-right: 10px;width:25%; float:left;"><pre class="debug" id="preDebug"></pre></div>
+			<div id="divContent" style="display: none; font-family: monospace; width:auto; overflow:hidden;"></div>
+		</div>
+	</body>
+</html>
