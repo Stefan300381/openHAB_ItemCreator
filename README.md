@@ -12,7 +12,7 @@ git clone https://github.com/Stefan300381/openHAB_ItemCreator
 #### 2. Make sure the file permissions are correct 
 ##### Example:
 ```
-chmod -R openhab:openhab /etc/openhab2/html/openHAB_ItemCreator
+sudo chown -R openhab:openhab openHAB_ItemCreator/
 ```
 #### 3. Browse to http://YOUR_OH_IP:YOUR_OH:PORT/static/openHAB_ItemCreator
 
