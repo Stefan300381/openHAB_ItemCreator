@@ -65,7 +65,6 @@
                                                 // JSON result in `data` variable
                                                 $("#preDebug").html(JSON.stringify(data,null, 4));
                                                 $.each( data.channels, function( index, value ){
-                                                        //$.getJSON($(location).attr("origin") + '/rest/channel-types/' + jQuery('<div />').text(value.channelTypeUID).html(), function(moredata) {
                                                         if (value.itemType) {
                                                                 $.getJSON($(location).attr("origin") + '/rest/channel-types/' + value.channelTypeUID, function(moredata) {
                                                                         // JSON result in `data` variable
