@@ -16,7 +16,8 @@ chmod -R openhab:openhab /etc/openhab2/html/openHAB_ItemCreator
 ```
 #### 3. Browse to http://YOUR_OH_IP:YOUR_OH:PORT/static/openHAB_ItemCreator
 
-The rest should be self explaining
 
+
+The rest should be self explaining:
 ![](https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/example.png)
 
