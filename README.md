@@ -18,4 +18,5 @@ chmod -R openhab:openhab /etc/openhab2/html/openHAB_ItemCreator
 
 The rest should be self explaining
 
+![](https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/example.png)
 
