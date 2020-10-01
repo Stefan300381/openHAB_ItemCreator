@@ -19,5 +19,5 @@ sudo chown -R openhab:openhab openHAB_ItemCreator/
 
 
 The rest should be self explaining:
-![](https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/example.png)
+![](https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/screenshot.png)
 
