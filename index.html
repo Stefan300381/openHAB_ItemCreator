@@ -9,6 +9,15 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$("#divDebug").resizable();
+				$("#chkDebug").prop( "checked", false ); //to fix Firefox caching issue
+				$("#txtItemName").on('keypress', function (event) {
+				    var regex = new RegExp("^[a-zA-Z0-9_]+$");
+				    var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+				    if (!regex.test(key)) {
+				       event.preventDefault();
+				       return false;
+				    }
+				});				
 				$("#chkDebug").click(function(){
 					if($(this).is(":checked")){
 						$("#divDebug").show();
@@ -18,8 +27,11 @@
 				});
 				$("#btnGetBindings").click(function(){
 					$("#divSelBindings").hide();
-                                        $("#divBtnGetThings").hide();
 					$('#selBindings').children().remove().end();
+                                        $("#divBtnGetThings").hide();
+					$("#divSelThings").hide();
+					$('#selThings').children().remove().end();
+					$("#divBtnCreateItems").hide();
 					$.getJSON($(location).attr("origin") + '/rest/bindings', function(data) {
    					 	// JSON result in `data` variable
 						$("#preDebug").html(JSON.stringify(data,null, 4));
@@ -37,8 +49,10 @@
 					});			    
 				}); 
 				$("#btnGetThings").click(function(){
-					$('#divSelThings').hide();
 					$("#divBtnCreateItems").hide();
+					$("#divItemName").hide();
+					$("#txtItemName").val('');
+					$('#divSelThings').hide();
 					$('#selThings').children().remove().end();
 					$.getJSON($(location).attr("origin") + '/rest/things', function(data) {
    					 	// JSON result in `data` variable
@@ -54,6 +68,7 @@
 							alert('Zero Things found!');
 						}else{
 							$("#divSelThings").show();
+							$("#divItemName").show();
 							$("#divBtnCreateItems").show();
 						}
 					});			    
@@ -72,12 +87,12 @@
                                                                         $("#preDebug").append(JSON.stringify(moredata,null, 4));
                                                                         if (moredata.hasOwnProperty('stateDescription')) {
                                                                                 if (moredata.stateDescription.hasOwnProperty('pattern')) {
-                                                                                        $("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + ' [' + moredata.stateDescription.pattern + ']" { channel="' + value.uid + '" }' + '</br>')
+                                                                                        $("#divContent").append(value.itemType + ' ' + $("#txtItemName").val() + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + moredata.label + ' [' + moredata.stateDescription.pattern + ']" { channel="' + value.uid + '" }' + '</br>')
                                                                                 }else{
-                                                                                        $("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + '" { channel="' + value.uid + '" }' + '</br>')
+                                                                                        $("#divContent").append(value.itemType + ' ' + $("#txtItemName").val() + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + moredata.label + '" { channel="' + value.uid + '" }' + '</br>')
                                                                                 }
                                                                         }else{
-                                                                                $("#divContent").append(value.itemType + ' ' + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + value.label + '" { channel="' + value.uid + '" }' + '</br>')
+                                                                                $("#divContent").append(value.itemType + ' ' + $("#txtItemName").val() + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + moredata.label + '" { channel="' + value.uid + '" }' + '</br>')
                                                                         }
                                                                 });
                                                         }
@@ -116,6 +131,7 @@
 			<div class="hidden menuitem" id="divBtnGetThings"><input type="button" id="btnGetThings" value="Get Things"></div>
 			<div class="hidden menuitem" id="divSelThings"><select id="selThings"></select></div>
 			<div class="hidden menuitem" id="divBtnCreateItems"><input type="button" id="btnCreateItems" value="Create Items"></div>
+			<div class="hidden menuitem" id="divItemName"><input type="text" id="txtItemName" placeholder="Optional ItemName modifier"></div>
 		</div>
 		<div>
 			<input type="checkbox" id="chkDebug" name="chkDebug" style="width: auto; height: auto; margin-bottom: 10px; margin-top: 10px;"><label for="chkDebug">Show raw REST response</label>
