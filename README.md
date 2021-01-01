@@ -1,6 +1,6 @@
 # openHAB_ItemCreator
 
-A simple webpage that helps to create an \*.items file for openHAB 2 (tested with v2.5.9)
+A simple webpage that helps to create an \*.items file for openHAB 2.5.10 and 3.0 (using API Token, see below)
 
 ## How to use:
 #### 1. clone or download the repository into you openhab html directory 
