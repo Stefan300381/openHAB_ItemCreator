@@ -17,7 +17,7 @@ sudo chown -R openhab:openhab openHAB_ItemCreator/
 #### 3. Browse to http://YOUR_OH_IP:YOUR_OH:PORT/static/openHAB_ItemCreator/index.html
 
 Example Screenshot:
-![](https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/demo.png)
+![](https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/demo.png&s=200)
 
 #### Remark for openHAB 2.x vs 3.x:
 The first field (API Token) should be ignored for openHAB 2 instances.
