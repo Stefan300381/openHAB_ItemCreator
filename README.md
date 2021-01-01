@@ -23,3 +23,5 @@ Example Screenshot:
 The first field (API Token) should be ignored for openHAB 2 instances.
 For openHAB 3 you need to create an API token first (and insert it here) to authorize any client using the REST web services.
 To do so you, login to your local "create API Token" portal: http://OPENHAB_HOST:OPENHAB_PORT/createApiToken
+
+![](https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/createAPIToken.png)
