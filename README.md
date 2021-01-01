@@ -27,5 +27,4 @@ To do so you, login to your local "create API Token" portal:
 ```
 http://OPENHAB_HOST:OPENHAB_PORT/createApiToken
 ```
-<br>
 <img src="https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/createAPIToken.png" width="30%" height="30%">
