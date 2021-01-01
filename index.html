@@ -36,21 +36,29 @@
 					$("#txtItemName").val('');
 					$("#divLabel").hide();
 					$("#txtLabel").val('');
-					$.getJSON($(location).attr("origin") + '/rest/bindings', function(data) {
-   					 	// JSON result in `data` variable
+					$.ajax({
+					    type: "GET",
+					    url: $(location).attr("origin") + '/rest/bindings',
+					    contentType: 'application/json',           
+					    beforeSend: function (xhr) {
+						xhr.setRequestHeader("Authorization", 'Bearer '+ $("#txtAPIToken").val());
+					    }
+					}).done(function (data) {
 						$("#preDebug").html(JSON.stringify(data,null, 4));
-						$.each( data, function( index, value ){
-							$('#selBindings').append(
-								$('<option></option>').val(value.id).html(value.name)
-							);
-						});
-						if ($("#selBindings option").length == 0) {
-							alert('Zero Bindings found!');
-						}else{
-							$("#divSelBindings").show();
-							$("#divBtnGetThings").show();
-						}
-					});			    
+                                                $.each( data, function( index, value ){
+                                                        $('#selBindings').append(
+                                                                $('<option></option>').val(value.id).html(value.name)
+                                                        );
+                                                });
+                                                if ($("#selBindings option").length == 0) {
+                                                        alert('Zero Bindings found!');
+                                                }else{
+                                                        $("#divSelBindings").show();
+                                                        $("#divBtnGetThings").show();
+                                                }
+					}).fail(function (jqXHR, textStatus, errorThrown)  {
+						alert('Calling openHAB REST API failed! ->' + errorThrown);
+					});
 				}); 
 				$("#btnGetThings").click(function(){
 					$("#divBtnCreateItems").hide();
@@ -62,59 +70,84 @@
 					$('#selThings').children().remove().end();
                                         $("#divContent").hide();
                                         $("#divContent").html("");
-					$.getJSON($(location).attr("origin") + '/rest/things', function(data) {
-   					 	// JSON result in `data` variable
+					$.ajax({
+					    type: "GET",
+					    url: $(location).attr("origin") + '/rest/things',
+					    contentType: 'application/json',           
+					    beforeSend: function (xhr) {
+						xhr.setRequestHeader("Authorization", 'Bearer '+ $("#txtAPIToken").val());
+					    }
+					}).done(function (data) {
 						$("#preDebug").html(JSON.stringify(data,null, 4));
-						$.each( data, function( index, value ){
-							if (value.thingTypeUID.indexOf($("#selBindings").val()) >= 0) {
-								$('#selThings').append(
-									$('<option></option>').val(value.UID).html(value.label)
-								);
-							}
-						});
-						if ($("#selThings option").length == 0) {
-							alert('Zero Things found!');
-						}else{
-							$("#divSelThings").show();
-							$("#divLabel").show();
-							$("#divTxtItemName").show();
-							$("#divBtnCreateItems").show();
-						}
-					});			    
+                                                $.each( data, function( index, value ){
+                                                        if (value.thingTypeUID.indexOf($("#selBindings").val()) >= 0) {
+                                                                $('#selThings').append(
+                                                                        $('<option></option>').val(value.UID).html(value.label)
+                                                                );
+                                                        }
+                                                });
+                                                if ($("#selThings option").length == 0) {
+                                                        alert('Zero Things found!');
+                                                }else{
+                                                        $("#divSelThings").show();
+                                                        $("#divLabel").show();
+                                                        $("#divTxtItemName").show();
+                                                        $("#divBtnCreateItems").show();
+                                                }
+					}).fail(function (jqXHR, textStatus, errorThrown)  {
+						alert('Calling openHAB REST API failed! ->' + errorThrown);
+					});
 				}); 
                                 $("#btnCreateItems").click(function(){
                                         $("#divContent").hide();
                                         $("#divContent").html("");
-                                        $.getJSON($(location).attr("origin") + '/rest/things/' + $("#selThings").val(), function(data) {
-                                                // JSON result in `data` variable
+                                        $.ajax({
+                                            type: "GET",
+                                            url: $(location).attr("origin") + '/rest/things/' + $("#selThings").val(),
+                                            contentType: 'application/json',
+					    beforeSend: function (xhr) {
+						xhr.setRequestHeader("Authorization", 'Bearer '+ $("#txtAPIToken").val());
+					    }
+                                        }).done(function (data) {
                                                 $("#preDebug").html(JSON.stringify(data,null, 4));
                                                 $.each( data.channels, function( index, value ){
                                                         if (value.itemType) {
-                                                                $.getJSON($(location).attr("origin") + '/rest/channel-types/' + value.channelTypeUID, function(moredata) {
+								$.ajax({
+								    type: "GET",
+								    url: $(location).attr("origin") + '/rest/channel-types/' + value.channelTypeUID,
+								    contentType: 'application/json',
+								    beforeSend: function (xhr) {
+									xhr.setRequestHeader("Authorization", 'Bearer '+ $("#txtAPIToken").val());
+								    }
+								}).done(function (moredata) {
                                                                         // JSON result in `data` variable
                                                                         $("#preDebug").append('<br>');
                                                                         $("#preDebug").append(JSON.stringify(moredata,null, 4));
                                                                         switch ($("#selLabelOptions").val()) {
-										case "overwrite":
-										moredata.label = $("#txtLabel").val();
-										break;
-										case "append":
-										moredata.label = $("#txtLabel").val() + moredata.label;
-										break;
-									}
-									if (moredata.hasOwnProperty('stateDescription')) {
+                                                                                case "overwrite":
+                                                                                moredata.label = $("#txtLabel").val();
+                                                                                break;
+                                                                                case "append":
+                                                                                moredata.label = $("#txtLabel").val() + moredata.label;
+                                                                                break;
+                                                                        }
+                                                                        if (moredata.hasOwnProperty('stateDescription')) {
                                                                                 if (moredata.stateDescription.hasOwnProperty('pattern')) {
                                                                                         $("#divContent").append(value.itemType + ' ' + $("#txtItemName").val() + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + moredata.label + ' [' + moredata.stateDescription.pattern + ']" { channel="' + value.uid + '" }' + '</br>')
                                                                                 }else{
-                                                                                        $("#divContent").append(value.itemType + ' ' + $("#txtItemName").val() + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + moredata.label + '" { channel="' + value.uid + '" }' + '</br>')
+                                                                                        $("#divContent").append(value.itemType + ' ' + $("#txtItemName").val() + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + moredata.label + '" { channel="' + value.uid + '" }' + '</br>')                                                                                
                                                                                 }
                                                                         }else{
                                                                                 $("#divContent").append(value.itemType + ' ' + $("#txtItemName").val() + value.id.replace(/[^a-z0-9\s]/gi, '_').replace(/[_\s]/g, '_').toUpperCase() + ' "' + moredata.label + '" { channel="' + value.uid + '" }' + '</br>')
                                                                         }
-                                                                });
+						                }).fail(function (jqXHR, textStatus, errorThrown)  {
+                        			                        alert('Inner Calling openHAB REST API failed! ->' + errorThrown);
+			                                        });
                                                         }
                                                 });
                                                 $("#divContent").show();
+					}).fail(function (jqXHR, textStatus, errorThrown)  {
+                                                alert('Calling openHAB REST API failed! ->' + errorThrown);
                                         });
                                 });
 			});
@@ -143,7 +176,9 @@
 				border: 1px solid grey;
 			}
 		</style>
-		<div style="width: 50%; overflow: hidden;">
+		<div style="width: 50%; overflow: hidden; padding: 5px; border: outset 1px grey;">
+
+			<div id="divAPIToken" style="float: left; width: 100%"><input type="text" id="txtAPIToken" placeholder="Optional API Token"></div>
 			<div class="menuitem"><input type="button" id="btnGetBindings" value="Get Bindings"></div>
 			<div class="hidden menuitem" id="divSelBindings"><select id="selBindings"></select></div>
 			<div class="hidden menuitem" id="divBtnGetThings"><input type="button" id="btnGetThings" value="Get Things"></div>
