@@ -7,6 +7,7 @@
 	</head>
 	<body>
 		<script type="text/javascript">
+			var version;
 			$(document).ready(function() {
 				$("#divDebug").resizable();
 				$("#chkDebug").prop( "checked", false ); //to fix Firefox caching issue
@@ -36,29 +37,100 @@
 					$("#txtItemName").val('');
 					$("#divLabel").hide();
 					$("#txtLabel").val('');
-					$.ajax({
-					    type: "GET",
-					    url: $(location).attr("origin") + '/rest/bindings',
-					    contentType: 'application/json',           
-					    beforeSend: function (xhr) {
-						xhr.setRequestHeader("Authorization", 'Bearer '+ $("#txtAPIToken").val());
-					    }
-					}).done(function (data) {
-						$("#preDebug").html(JSON.stringify(data,null, 4));
-                                                $.each( data, function( index, value ){
-                                                        $('#selBindings').append(
-                                                                $('<option></option>').val(value.id).html(value.name)
-                                                        );
-                                                });
-                                                if ($("#selBindings option").length == 0) {
-                                                        alert('Zero Bindings found!');
-                                                }else{
-                                                        $("#divSelBindings").show();
-                                                        $("#divBtnGetThings").show();
-                                                }
-					}).fail(function (jqXHR, textStatus, errorThrown)  {
-						alert('Calling openHAB REST API failed! ->' + errorThrown);
+					
+					async function getAddons(){
+						var result = await $.ajax({
+								type: "GET",
+								url: $(location).attr("origin") + '/rest/addons',
+								contentType: 'application/json',           
+								beforeSend: function (xhr) {
+								xhr.setRequestHeader("Authorization", 'Bearer '+ $("#txtAPIToken").val());
+								}
+							}).done(function (data) {
+								//$("#preDebug").html(JSON.parse(data,null, 4));
+														$.each( data, function( index, value ){
+																if(value.installed && value.type == "binding")
+																{
+																	$('#selBindings').append(
+																		$('<option></option>').val(value.id).html(value.label)
+																	);
+																}
+														});
+							}).fail(function (jqXHR, textStatus, errorThrown)  {
+								alert('Calling openHAB REST API failed! ->' + errorThrown);
+							});
+					
+					return result;
+					};
+					
+					async function getBindings() {
+						var result = await $.ajax({
+								type: "GET",
+								url: $(location).attr("origin") + '/rest/bindings',
+								contentType: 'application/json',           
+								beforeSend: function (xhr) {
+								xhr.setRequestHeader("Authorization", 'Bearer '+ $("#txtAPIToken").val());
+								}
+							}).done(function (data) {
+								//$("#preDebug").html(JSON.stringify(data,null, 4));
+														$.each( data, function( index, value ){
+																$('#selBindings').append(
+																		$('<option></option>').val(value.id).html(value.name)
+																);
+														});
+							}).fail(function (jqXHR, textStatus, errorThrown)  {
+								if(jqXHR.status != 404)
+								{
+									alert('Calling openHAB REST API failed! ->' + errorThrown);
+								}
+							});
+					
+						return result;
+					};
+					
+					async function getOHVersion() {
+						var result = await $.ajax({
+								type: "GET",
+								url: $(location).attr("origin") + '/rest',
+								contentType: 'application/json',           
+								beforeSend: function (xhr) {
+								xhr.setRequestHeader("Authorization", 'Bearer '+ $("#txtAPIToken").val());
+								}
+							}).done(function (data) {
+								//$("#preDebug").html(JSON.stringify(data,null, 4));
+														version = data.runtimeInfo.version.charAt(0);
+							}).fail(function (jqXHR, textStatus, errorThrown)  {
+								if(jqXHR.status != 404)
+								{
+									alert('Calling openHAB REST API failed! ->' + errorThrown);
+								}
+							});
+					
+						return result;
+					};
+					
+					function checkResult() {
+						if ($("#selBindings option").length == 0) {
+							alert('Zero Bindings found!');
+						}else{
+							$("#divSelBindings").show();
+							$("#divBtnGetThings").show();
+						}
+					};
+					
+					getOHVersion().catch(console.error).then(() => {
+						getAddons().catch(console.error).then(() => {
+							if(version==3)
+							{
+								getBindings().catch(console.error).then(() => {
+									checkResult();
+								});
+							}else{
+								checkResult();
+							}
+						});
 					});
+					
 				}); 
 				$("#btnGetThings").click(function(){
 					$("#divBtnCreateItems").hide();
