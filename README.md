@@ -1,6 +1,6 @@
 # openHAB_ItemCreator
 
-A simple webpage that helps to create an \*.items file for openHAB 2.5.10 and 3.0 (using API Token, see below)
+A simple webpage that helps to create an \*.items file for openHAB 2.5.10 and 3.x/4.x (using API Token, see below)
 
 ## How to use:
 #### 1. clone or download the repository into you openhab html directory 
@@ -20,9 +20,9 @@ Example Screenshot:
 <br>
 <img src="https://raw.githubusercontent.com/Stefan300381/openHAB_ItemCreator/dev/assets/demo.png" width="30%" height="30%">
 
-#### Remark for openHAB 2.x vs 3.x:
+#### Remark for openHAB 2.x vs 3.x/4.x:
 The first field (API Token) should be ignored for openHAB 2 instances.
-For openHAB 3 you need to create an API token first (and insert it here) to authorize any client using the REST web services.
+For openHAB 3.x/4.x you need to create an API token first (and insert it here) to authorize any client using the REST web services.
 To do so you, login to your local "create API Token" portal: 
 ```
 http://OPENHAB_HOST:OPENHAB_PORT/createApiToken
